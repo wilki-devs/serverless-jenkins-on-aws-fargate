@@ -1,5 +1,5 @@
 jenkins:
-    systemMessage: "Amazon Fargate Demo"
+    systemMessage: "Wilki Application Development Jenkins instance"
     numExecutors: 0
     remotingSecurity:
       enabled: true
@@ -72,58 +72,3 @@ jenkins:
 security:
   sSHD:
     port: -1
-jobs:
-  - script: >
-      pipelineJob('Simple job critical task') {
-        definition {
-          cps {
-            script('''
-              pipeline {
-                  agent {
-                      ecs {
-                          inheritFrom 'build-example'
-                      }
-                  }
-                  stages {
-                    stage('Test') {
-                        steps {
-                            script {
-                                sh "echo this was executed on non spot instance"
-                            }
-                            sh 'sleep 120'
-                            sh 'echo sleep is done'
-                        }
-                    }
-                  }
-              }'''.stripIndent())
-              sandbox()
-          }
-        }
-      }
-  - script: >
-      pipelineJob('Simple job non critical task') {
-        definition {
-          cps {
-            script('''
-              pipeline {
-                  agent {
-                      ecs {
-                          inheritFrom 'build-example-spot'
-                      }
-                  }
-                  stages {
-                    stage('Test') {
-                        steps {
-                            script {
-                                sh "echo this was executed on a spot instance"
-                            }
-                            sh 'sleep 120'
-                            sh 'echo sleep is done'
-                        }
-                    }
-                  }
-              }'''.stripIndent())
-              sandbox()
-          }
-        }
-      }
