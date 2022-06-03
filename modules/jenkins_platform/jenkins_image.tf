@@ -36,6 +36,7 @@ data "template_file" jenkins_configuration_def {
 resource "null_resource" "render_template" {
   triggers = {
     src_hash = file("${path.module}/docker/files/jenkins.yaml.tpl")
+    always_run = timestamp()
   }
   depends_on = [data.template_file.jenkins_configuration_def]
 
