@@ -32,7 +32,7 @@ jenkins:
               templates:
                   - cpu: "512"
                     image: "jenkins/inbound-agent"
-                    label: "build-example-spot"
+                    label: "build-on-fargate-spot"
                     executionRole: ${execution_role_arn}
                     launchType: "FARGATE"
                     memory: 0
@@ -56,7 +56,7 @@ jenkins:
               templates:
                   - cpu: "512"
                     image: "jenkins/inbound-agent"
-                    label: "build-example"
+                    label: "build-on-fargate"
                     executionRole: ${execution_role_arn}
                     launchType: "FARGATE"
                     memory: 0
