@@ -31,7 +31,7 @@ jenkins:
               jenkinsUrl: "http://${jenkins_cloud_map_name}:${jenkins_controller_port}"
               templates:
                   - cpu: "512"
-                    image: "jenkins/inbound-agent"
+                    image: "${jenkins_node_image}"
                     label: "build-on-fargate-spot"
                     executionRole: ${execution_role_arn}
                     launchType: "FARGATE"
@@ -55,7 +55,7 @@ jenkins:
               jenkinsUrl: "http://${jenkins_cloud_map_name}:${jenkins_controller_port}"
               templates:
                   - cpu: "512"
-                    image: "jenkins/inbound-agent"
+                    image: "${jenkins_node_image}"
                     label: "build-on-fargate"
                     executionRole: ${execution_role_arn}
                     launchType: "FARGATE"

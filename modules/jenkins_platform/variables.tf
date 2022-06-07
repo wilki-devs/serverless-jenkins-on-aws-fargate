@@ -5,6 +5,11 @@ variable jenkins_ecr_repository_name {
   description = "Name for Jenkins controller ECR repository"
 }
 
+variable jenkins_node_ecr_repository_name {
+  type        = string
+  default     = "serverless-jenkins-node"
+  description = "Name for Jenkins node ECR repository"
+}
 
 variable name_prefix {
   type    = string

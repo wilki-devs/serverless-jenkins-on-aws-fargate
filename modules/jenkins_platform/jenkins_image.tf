@@ -12,7 +12,15 @@ resource "aws_ecr_repository" "jenkins_controller" {
   image_scanning_configuration  {
       scan_on_push = true
   }
+}
 
+resource "aws_ecr_repository" "jenkins_node" {
+  name                 =  var.jenkins_node_ecr_repository_name
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration  {
+      scan_on_push = true
+  }
 }
 
 data "template_file" jenkins_configuration_def {
@@ -24,7 +32,8 @@ data "template_file" jenkins_configuration_def {
     ecs_cluster_fargate_spot  = aws_ecs_cluster.jenkins_agents.arn
     cluster_region            = local.region
     jenkins_cloud_map_name    = "controller.${var.name_prefix}"
-    jenkins_controller_port       = var.jenkins_controller_port
+    jenkins_controller_port   = var.jenkins_controller_port
+    jenkins_node_image        = "${aws_ecr_repository.jenkins_node.repository_url}:latest"
     jnlp_port                 = var.jenkins_jnlp_port
     agent_security_groups     = aws_security_group.jenkins_controller_security_group.id
     execution_role_arn        = aws_iam_role.ecs_execution_role.arn
@@ -59,6 +68,21 @@ resource "null_resource" "build_docker_image" {
 docker login -u AWS -p ${data.aws_ecr_authorization_token.token.password} ${local.ecr_endpoint} && \
 docker build -t ${aws_ecr_repository.jenkins_controller.repository_url}:latest ${path.module}/docker/ && \
 docker push ${aws_ecr_repository.jenkins_controller.repository_url}:latest
+EOF
+  }
+}
+
+resource "null_resource" "build_docker_image_node" {
+  triggers = {
+     src_hash   = file("${path.module}/docker/files/jenkins.yaml.tpl")
+     always_run = timestamp()
+  }
+  depends_on = [null_resource.render_template]
+  provisioner "local-exec" {
+    command = <<EOF
+docker login -u AWS -p ${data.aws_ecr_authorization_token.token.password} ${local.ecr_endpoint} && \
+docker build -t ${aws_ecr_repository.jenkins_node.repository_url}:latest ${path.module}/docker/node/ && \
+docker push ${aws_ecr_repository.jenkins_node.repository_url}:latest
 EOF
   }
 }
